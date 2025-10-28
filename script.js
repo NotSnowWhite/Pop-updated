@@ -273,7 +273,45 @@ startFromTutorial?.addEventListener('click', ()=>{
 // high-score persistence
 const highscoreVal = document.getElementById('highscoreVal')
 function loadHighscore(){ const v = parseInt(localStorage.getItem('pop_highscore')||'0'); highscoreVal.textContent = v }
-function saveHighscore(){ const v = parseInt(localStorage.getItem('pop_highscore')||'0'); if(state.score > v){ localStorage.setItem('pop_highscore', String(state.score)); highscoreVal.textContent = state.score } }
+
+// --- milestone toast (injected) and leaderboard storage/UI ---
+function ensureMilestoneContainer(){ if(document.getElementById('milestoneToastContainer')) return; const style = document.createElement('style'); style.id = 'milestoneToastStyles'; style.textContent = `#milestoneToastContainer{position:fixed;top:86px;left:50%;transform:translateX(-50%);z-index:99999;pointer-events:none;display:flex;flex-direction:column;align-items:center}
+.milestoneToast{background:linear-gradient(90deg,#f59e0b,#f472b6);color:#fff;padding:8px 14px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.22);margin-top:8px;font-weight:700;opacity:0;transform:translateY(-6px);transition:opacity 260ms ease, transform 260ms cubic-bezier(.2,.8,.2,1);pointer-events:auto}
+@media(max-width:480px){#milestoneToastContainer{top:68px}}`;
+  document.head.appendChild(style);
+  const c = document.createElement('div'); c.id = 'milestoneToastContainer'; c.setAttribute('aria-live','polite'); document.body.appendChild(c);
+}
+
+function showMilestone(msg, ms = 2400){ try{ ensureMilestoneContainer(); const c = document.getElementById('milestoneToastContainer'); const t = document.createElement('div'); t.className = 'milestoneToast'; t.textContent = msg; c.appendChild(t); requestAnimationFrame(()=>{ t.style.opacity = '1'; t.style.transform = 'translateY(0)'; }); setTimeout(()=>{ t.style.opacity = '0'; t.style.transform = 'translateY(-8px)'; setTimeout(()=>t.remove(),260); }, ms); }catch(e){console.warn('milestone failed',e)} }
+
+// leaderboard: store recent plays (name, score, date) in localStorage
+function loadPlays(){ try{ const raw = localStorage.getItem('pop_plays'); return raw ? JSON.parse(raw) : [] }catch(e){ return [] } }
+function savePlays(plays){ try{ localStorage.setItem('pop_plays', JSON.stringify(plays)) }catch(e){ console.warn('savePlays failed', e) } }
+
+function recordPlay(name){ try{ const plays = loadPlays(); plays.push({ name: (name || 'Player'), score: state.score, date: new Date().toISOString() }); plays.sort((a,b)=>b.score - a.score || new Date(b.date) - new Date(a.date)); if(plays.length>100) plays.length = 100; savePlays(plays); }catch(e){console.warn('recordPlay failed', e)} }
+
+function ensureLeaderboardModal(){ if(document.getElementById('leaderboardModal')) return; const style = document.createElement('style'); style.id='leaderboardStyles'; style.textContent = `#leaderboardModal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:99998}
+.leaderboardPanel{background:white;border-radius:10px;padding:16px;min-width:320px;max-width:92vw;max-height:86vh;overflow:auto}
+.leaderboardPanel h3{margin:0 0 8px 0}
+.leaderboardTable{width:100%;border-collapse:collapse;margin-top:8px}
+.leaderboardTable th,.leaderboardTable td{padding:6px 8px;text-align:left;border-bottom:1px solid rgba(0,0,0,0.06)}
+.leaderboardActions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.leaderboardActions button{background:#06b6d4;color:#fff;border:none;padding:8px 10px;border-radius:6px;cursor:pointer}`; document.head.appendChild(style);
+  const modal = document.createElement('div'); modal.id='leaderboardModal'; modal.className='hidden'; modal.style.display='none'; const panel = document.createElement('div'); panel.className='leaderboardPanel'; panel.innerHTML = `<h3>Leaderboard</h3><div id="leaderboardContent">Loading...</div><div class="leaderboardActions"><button id="clearLeaderboardBtn">Clear</button><button id="closeLeaderboardBtn">Close</button></div>`; modal.appendChild(panel); document.body.appendChild(modal);
+  document.getElementById('closeLeaderboardBtn').addEventListener('click', ()=>{ modal.style.display='none' });
+  document.getElementById('clearLeaderboardBtn').addEventListener('click', ()=>{ if(confirm('Clear leaderboard?')){ savePlays([]); populateLeaderboard(); } });
+}
+
+function populateLeaderboard(){ ensureLeaderboardModal(); const modal = document.getElementById('leaderboardModal'); const content = document.getElementById('leaderboardContent'); const plays = loadPlays(); if(plays.length===0){ content.innerHTML = '<div style="padding:12px;color:#6b7280">No plays yet — be the first!</div>'; } else { let html = `<table class="leaderboardTable"><thead><tr><th>#</th><th>Name</th><th>Score</th><th>Date</th></tr></thead><tbody>`; plays.slice(0,50).forEach((p,i)=>{ const d = new Date(p.date); html += `<tr><td>${i+1}</td><td>${escapeHtml(p.name)}</td><td>${p.score}</td><td>${d.toLocaleString()}</td></tr>` }); html += `</tbody></table>`; content.innerHTML = html; } modal.style.display = 'flex'; }
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]||c)); }
+
+// wire leaderboard button
+const leaderboardBtn = document.getElementById('leaderboardBtn')
+if(leaderboardBtn){ leaderboardBtn.addEventListener('click', (e)=>{ e.preventDefault(); populateLeaderboard(); }) }
+
+// show a milestone toast when a new high score is saved
+function saveHighscore(){ const v = parseInt(localStorage.getItem('pop_highscore')||'0'); if(state.score > v){ localStorage.setItem('pop_highscore', String(state.score)); highscoreVal.textContent = state.score; try{ showMilestone(`New High Score: ${state.score}!`) }catch(e){} } }
 loadHighscore()
 
 // shop toggle
@@ -313,7 +351,18 @@ function checkWinLose(){updateUI(); // lose if poison >= 100 or if coins can't b
 }
 
 function loseGame(reason){state.running=false; messageTitle.textContent='Game Over'; messageText.textContent = reason; messageOverlay.classList.remove('hidden')}
-function winGame(){state.running=false; messageTitle.textContent='You Win!'; messageText.textContent = `Score: ${state.score}`; messageOverlay.classList.remove('hidden'); launchConfetti();}
+function loseGame(reason){
+  state.running=false;
+  // record the play to leaderboard
+  try{ const name = prompt('Name for leaderboard (optional):','Player'); if(name !== null) recordPlay(name.trim() || 'Player'); }catch(e){}
+  messageTitle.textContent='Game Over'; messageText.textContent = reason; messageOverlay.classList.remove('hidden')
+}
+function winGame(){
+  state.running=false;
+  // record the play to leaderboard
+  try{ const name = prompt('Name for leaderboard (optional):','Player'); if(name !== null) recordPlay(name.trim() || 'Player'); }catch(e){}
+  messageTitle.textContent='You Win!'; messageText.textContent = `Score: ${state.score}`; messageOverlay.classList.remove('hidden'); launchConfetti();
+}
 
 replayBtn.addEventListener('click', ()=>{resetGame()})
 exitBtn.addEventListener('click', ()=>{ messageOverlay.classList.add('hidden'); messageText.textContent=''; if(!state.running) resetGame() })

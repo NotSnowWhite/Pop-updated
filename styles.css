@@ -6,6 +6,19 @@
 	font-family: 'Baloo 2', 'Segoe UI', Roboto, Arial, sans-serif
 }
 
+/* Leaderboard modal and milestone toast styles (in case JS-injected styles don't load) */
+#leaderboardModal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:99998}
+.leaderboardPanel{background:white;border-radius:10px;padding:16px;min-width:320px;max-width:92vw;max-height:86vh;overflow:auto}
+.leaderboardPanel h3{margin:0 0 8px 0}
+.leaderboardTable{width:100%;border-collapse:collapse;margin-top:8px}
+.leaderboardTable th,.leaderboardTable td{padding:6px 8px;text-align:left;border-bottom:1px solid rgba(0,0,0,0.06)}
+.leaderboardActions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.leaderboardActions button{background:#06b6d4;color:#fff;border:none;padding:8px 10px;border-radius:6px;cursor:pointer}
+
+#milestoneToastContainer{position:fixed;top:86px;left:50%;transform:translateX(-50%);z-index:99999;pointer-events:none;display:flex;flex-direction:column;align-items:center}
+.milestoneToast{background:linear-gradient(90deg,#f59e0b,#f472b6);color:#fff;padding:8px 14px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.22);margin-top:8px;font-weight:700;opacity:0;transform:translateY(-6px);transition:opacity 260ms ease, transform 260ms cubic-bezier(.2,.8,.2,1);pointer-events:auto}
+@media(max-width:480px){#milestoneToastContainer{top:68px}}
+
 /* Small-screen overrides to prevent overlap and ensure stacking */
 @media (max-width: 700px) {
 	body { justify-content: flex-start; padding-top: 8px; }
