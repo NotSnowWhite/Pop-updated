@@ -56,7 +56,7 @@ header h1 {
 .header-right {
 	display: flex;
 	align-items: center;
-	gap: 8px
+	gap: 6px; /* slightly tighter so buttons don't push into the center */
 }
 
 .storeToggle {
@@ -71,6 +71,26 @@ header h1 {
 
 .storeToggle:hover {
 	transform: translateY(-2px)
+}
+
+/* smaller variant for header controls (store / reset / tutorial) */
+.smallBtn {
+	padding: 4px 8px;
+	font-size: 13px;
+	border-radius: 8px;
+	min-width: 36px;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+/* make the emoji a fixed size and allow labels to be hidden on small screens */
+.btn-emoji {
+	line-height: 1;
+	font-size: 16px;
+}
+.btn-label {
+	display: inline-block;
 }
 
 .counter {
@@ -421,6 +441,22 @@ footer {
 
 .modal button#backFromTutorial {
 	background: #6b7280
+}
+
+/* Responsive adjustments to keep header controls from overlapping the centered progress bar */
+@media (max-width: 640px) {
+	header { padding: 8px 12px; }
+	.smallBtn { padding: 4px 6px; font-size: 12px; gap: 4px; }
+	.btn-label { display: none; }
+	/* increase progress width slightly so center area avoids header controls on small screens */
+	#progress { width: 60%; }
+	#topCenter { margin-top: 6px; }
+}
+
+@media (max-width: 420px) {
+	#progress { width: 56%; }
+	.btn-emoji { font-size: 15px }
+	.smallBtn { min-width: 32px }
 }
 
 /* coin counter animation */

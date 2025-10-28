@@ -224,14 +224,51 @@ const startBtn = document.getElementById('startBtn')
 const readBtn = document.getElementById('readBtn')
 const backFromTutorial = document.getElementById('backFromTutorial')
 const startFromTutorial = document.getElementById('startFromTutorial')
+const tutorialBtn = document.getElementById('tutorialBtn')
+// track whether tutorial was opened from the home/start modal or from in-game
+let wasRunningBeforeTutorial = null
+let tutorialOpenedFromHome = false
 
 // Show the home modal on load (unless we decide to auto-skip later)
 homeModal.classList.remove('hidden')
 
 startBtn.addEventListener('click', ()=>{ homeModal.classList.add('hidden'); resetGame() })
-readBtn.addEventListener('click', ()=>{ homeModal.classList.add('hidden'); tutorialEl.classList.remove('hidden') })
-backFromTutorial?.addEventListener('click', ()=>{ tutorialEl.classList.add('hidden'); homeModal.classList.remove('hidden') })
-startFromTutorial?.addEventListener('click', ()=>{ tutorialEl.classList.add('hidden'); resetGame() })
+
+// When reading the tutorial from the start/home modal, behave as before
+readBtn.addEventListener('click', ()=>{ tutorialOpenedFromHome = true; homeModal.classList.add('hidden'); tutorialEl.classList.remove('hidden') })
+
+// Tutorial button in the header: open tutorial and pause the current game until closed
+tutorialBtn?.addEventListener('click', ()=>{
+  tutorialOpenedFromHome = false
+  wasRunningBeforeTutorial = state.running
+  state.running = false // pause the game
+  tutorialEl.classList.remove('hidden')
+})
+
+// Closing the tutorial: behave based on where it was opened from
+backFromTutorial?.addEventListener('click', ()=>{
+  tutorialEl.classList.add('hidden')
+  if(tutorialOpenedFromHome){
+    // go back to the home modal as before
+    homeModal.classList.remove('hidden')
+  } else {
+    // resume previous running state
+    state.running = (wasRunningBeforeTutorial !== null) ? wasRunningBeforeTutorial : true
+    wasRunningBeforeTutorial = null
+  }
+})
+
+startFromTutorial?.addEventListener('click', ()=>{
+  tutorialEl.classList.add('hidden')
+  if(tutorialOpenedFromHome){
+    // user chose to start the game from the tutorial on the start page
+    resetGame()
+  } else {
+    // resume the game that was paused
+    state.running = (wasRunningBeforeTutorial !== null) ? wasRunningBeforeTutorial : true
+    wasRunningBeforeTutorial = null
+  }
+})
 
 // high-score persistence
 const highscoreVal = document.getElementById('highscoreVal')
