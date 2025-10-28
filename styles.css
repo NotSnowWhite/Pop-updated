@@ -19,6 +19,12 @@
 .milestoneToast{background:linear-gradient(90deg,#f59e0b,#f472b6);color:#fff;padding:8px 14px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.22);margin-top:8px;font-weight:700;opacity:0;transform:translateY(-6px);transition:opacity 260ms ease, transform 260ms cubic-bezier(.2,.8,.2,1);pointer-events:auto}
 @media(max-width:480px){#milestoneToastContainer{top:68px}}
 
+/* visual for max balloons */
+.maxBalloon{box-shadow: 0 8px 18px rgba(250,200,40,0.28), inset 0 2px 8px rgba(255,255,255,0.25); outline: 2px solid rgba(250,200,40,0.9)}
+
+/* level value next to highscore */
+#levelVal{font-size:13px;color:#0f172a}
+
 /* Small-screen overrides to prevent overlap and ensure stacking */
 @media (max-width: 700px) {
 	body { justify-content: flex-start; padding-top: 8px; }
@@ -97,42 +103,10 @@ body {
 	gap: 6px;
 }
 
+
 img {
-	width: auto;
-	height: 20px;
-}
-
-header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 12px 20px;
-	background: linear-gradient(90deg, #ffedd5, #fff7ed);
-	position: relative;
-	flex-wrap: wrap
-}
-
-header h1 {
-	margin: 0;
-	font-size: 28px;
-	color: #b91c1c;
-	text-shadow: 0 2px 0 rgba(255, 255, 255, 0.6)
-}
-
-.header-right {
-	display: flex;
-	align-items: center;
-	gap: 6px; /* slightly tighter so buttons don't push into the center */
-}
-
-.storeToggle {
-	background: linear-gradient(180deg, #fff7ed, #fff1f2);
-	border-radius: 12px;
-	padding: 8px 12px;
-	border: 2px solid #ffd1dc;
-	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-	font-weight: 800;
-	cursor: pointer
+		width: auto;
+		height: 20px;
 }
 
 .storeToggle:hover {
@@ -540,6 +514,35 @@ footer {
 
 	100% {
 		transform: scale(1)
+	/* Current score badge */
+	#currentScore{
+		position:fixed;
+		top:12px;
+		left:50%;
+		transform:translateX(-50%);
+		background:rgba(0,0,0,0.66);
+		color:#fff;
+		padding:6px 10px;
+		border-radius:10px;
+		font-weight:700;
+		font-size:14px;
+		z-index:99999;
+		pointer-events:none;
+		box-shadow:0 6px 18px rgba(0,0,0,0.18);
+	}
+
+	@media (max-width: 480px){
+		/* move badge to top-right on small screens to avoid covering centered title */
+		#currentScore{
+			left:auto;
+			right:8px;
+			transform:none;
+			top:8px;
+			padding:5px 8px;
+			font-size:12px;
+			border-radius:8px;
+		}
+	}
 	}
 }
 
@@ -600,7 +603,7 @@ header .header-right {
 header #topCenter {
 	position: absolute;
 	left: 50%;
-	top: calc(50% + 35px); /* nudge down by 15px */
+	top: calc(50% + 3z5px); /* nudge down by 15px */
 	transform: translate(-50%, -50%);
 	pointer-events: none;
 	z-index: 60;

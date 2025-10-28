@@ -29,11 +29,13 @@ let state = {
   weapon: 'darts',
   ammoCounts: {darts: CONFIG.startAmmo, arrows:0, shuriken:0, kunai:0},
   score: 0,
+  level: 1,
   water: 0, // percent of progress bar
   poison: 0,
   chainWater: 0,
   chainPoison: 0,
   balloons: [],
+  highscoreAnnounced: false,
   running: true,
 }
 
@@ -80,7 +82,18 @@ function pickCoinAmount(){
   return chooseWeighted(CONFIG.coinValues, CONFIG.coinRarityWeights)
 }
 
-function pickDropType(){return chooseWeighted(['water','poison','coin'], [CONFIG.dropTypeWeights.water, CONFIG.dropTypeWeights.poison, CONFIG.dropTypeWeights.coin])}
+function pickDropType(){
+  // adjust weights slightly per level to bias toward more poison as levels increase
+  try{
+    const lvl = state.level || 1
+    const base = CONFIG.dropTypeWeights || {water:48, poison:37, coin:15}
+    // increase poison weight by 2 per level, decrease water by same amount but keep minimum 6
+    const shift = Math.max(0, Math.min(6, (lvl-1) * 2))
+    const waterW = Math.max(6, base.water - shift)
+    const poisonW = Math.max(6, base.poison + shift)
+    return chooseWeighted(['water','poison','coin'], [waterW, poisonW, base.coin])
+  }catch(e){ return chooseWeighted(['water','poison','coin'], [CONFIG.dropTypeWeights.water, CONFIG.dropTypeWeights.poison, CONFIG.dropTypeWeights.coin]) }
+}
 
 function updateUI(){coinCountEl.textContent = state.coins; ammoCountEl.textContent = state.ammoCounts[state.weapon] || 0; weaponIconEl.textContent = CONFIG.weapons[state.weapon].icon || '🎯'; weaponNameEl.textContent = CONFIG.weapons[state.weapon].name || state.weapon; waterBar.style.width = `${state.water}%`; poisonBar.style.width = `${state.poison}%` }
 
@@ -96,6 +109,12 @@ function spawnBalloons(count=9){clearBalloons();const colors = ['#f43f5e','#fb92
     el.style.left = x+'px'; el.style.top = y+'px'; const color = colors[Math.floor(Math.random()*colors.length)]; el.style.background = `radial-gradient(circle at 30% 20%, rgba(255,255,255,0.9), rgba(255,255,255,0.2)), ${color}`
     // assign drop
     const dropType = pickDropType(); let coinAmount = 0; if(dropType==='coin') coinAmount = pickCoinAmount()
+    // small chance to spawn a "max" balloon that fills the bar when popped
+    // initial 1% chance, increases by 2% per level
+    try{
+      const chance = Math.min(1, 0.01 + ((state.level||1)-1) * 0.02)
+      if(Math.random() < chance){ el.classList.add('maxBalloon'); el.dataset.max = '1' }
+    }catch(e){}
     el.dataset.type = dropType; el.dataset.coins = coinAmount; el.dataset.popped = 'false'
     el.addEventListener('click', onPop)
     board.appendChild(el); state.balloons.push(el); placed.push({x,y})
@@ -103,7 +122,13 @@ function spawnBalloons(count=9){clearBalloons();const colors = ['#f43f5e','#fb92
 }
 
 // addBalloons: append balloons without clearing existing ones (used by respawn)
-function addBalloons(count=1){const colors = ['#f43f5e','#fb923c','#f59e0b','#facc15','#34d399','#60a5fa','#a78bfa','#f472b6']; const placed = state.balloons.map(b=>{ return { x: parseInt(b.style.left||'0'), y: parseInt(b.style.top||'0') } }); const w=64,h=84; for(let i=0;i<count;i++){ let attempts=0; let x,y; let ok=false; while(attempts<40 && !ok){ x=randInt(10, Math.max(10, board.clientWidth - w - 10)); y=randInt(20, Math.max(20, board.clientHeight - h - 20)); ok=true; for(const p of placed){ const dx=p.x-x; const dy=p.y-y; if(Math.hypot(dx,dy) < 90){ ok=false; break } } attempts++ } if(!ok){ x=randInt(10, Math.max(10, board.clientWidth - w - 10)); y=randInt(20, Math.max(20, board.clientHeight - h - 20)) } const el=document.createElement('div'); el.className='balloon'; el.style.left = x+'px'; el.style.top = y+'px'; const color = colors[Math.floor(Math.random()*colors.length)]; el.style.background = `radial-gradient(circle at 30% 20%, rgba(255,255,255,0.9), rgba(255,255,255,0.2)), ${color}`; const dropType = pickDropType(); let coinAmount=0; if(dropType==='coin') coinAmount = pickCoinAmount(); el.dataset.type = dropType; el.dataset.coins = coinAmount; el.dataset.popped='false'; el.addEventListener('click', onPop); board.appendChild(el); state.balloons.push(el); placed.push({x,y}) } }
+function addBalloons(count=1){const colors = ['#f43f5e','#fb923c','#f59e0b','#facc15','#34d399','#60a5fa','#a78bfa','#f472b6']; const placed = state.balloons.map(b=>{ return { x: parseInt(b.style.left||'0'), y: parseInt(b.style.top||'0') } }); const w=64,h=84; for(let i=0;i<count;i++){ let attempts=0; let x,y; let ok=false; while(attempts<40 && !ok){ x=randInt(10, Math.max(10, board.clientWidth - w - 10)); y=randInt(20, Math.max(20, board.clientHeight - h - 20)); ok=true; for(const p of placed){ const dx=p.x-x; const dy=p.y-y; if(Math.hypot(dx,dy) < 90){ ok=false; break } } attempts++ } if(!ok){ x=randInt(10, Math.max(10, board.clientWidth - w - 10)); y=randInt(20, Math.max(20, board.clientHeight - h - 20)) } const el=document.createElement('div'); el.className='balloon'; el.style.left = x+'px'; el.style.top = y+'px'; const color = colors[Math.floor(Math.random()*colors.length)]; el.style.background = `radial-gradient(circle at 30% 20%, rgba(255,255,255,0.9), rgba(255,255,255,0.2)), ${color}`; const dropType = pickDropType(); let coinAmount=0; if(dropType==='coin') coinAmount = pickCoinAmount(); el.dataset.type = dropType; el.dataset.coins = coinAmount; el.dataset.popped='false';
+    // small chance to spawn a "max" balloon that fills the bar when popped
+    try{
+      const chance = Math.min(1, 0.01 + ((state.level||1)-1) * 0.02)
+      if(Math.random() < chance){ el.classList.add('maxBalloon'); el.dataset.max = '1' }
+    }catch(e){}
+    el.addEventListener('click', onPop); board.appendChild(el); state.balloons.push(el); placed.push({x,y}) } }
 
 function clearBalloons(){state.balloons.forEach(b=>b.remove()); state.balloons=[]}
 
@@ -122,8 +147,15 @@ function onPop(e){if(!state.running) return; const el = e.currentTarget; if(el.d
 
   const type = el.dataset.type
   if(type==='coin') handleCoinPop(centerX, centerY, parseInt(el.dataset.coins||'0'), el)
-  if(type==='water') handleWaterPop(centerX, centerY, el)
-  if(type==='poison') handlePoisonPop(centerX, centerY, el)
+  if(type==='water'){
+    // if this is a max balloon, fill the water bar
+    if(el.dataset.max === '1'){ state.water = 100 }
+    handleWaterPop(centerX, centerY, el)
+  }
+  if(type==='poison'){
+    if(el.dataset.max === '1'){ state.poison = 100 }
+    handlePoisonPop(centerX, centerY, el)
+  }
   // remove balloon element
   setTimeout(()=>el.remove(),420)
   checkWinLose()
@@ -273,6 +305,9 @@ startFromTutorial?.addEventListener('click', ()=>{
 // high-score persistence
 const highscoreVal = document.getElementById('highscoreVal')
 function loadHighscore(){ const v = parseInt(localStorage.getItem('pop_highscore')||'0'); highscoreVal.textContent = v }
+// ensure level display sits next to highscore
+function ensureLevelDisplay(){ const hs = document.getElementById('highscore'); if(!hs) return; if(!document.getElementById('levelVal')){ const span = document.createElement('span'); span.id = 'levelVal'; span.style.fontWeight='700'; span.style.marginLeft='10px'; span.textContent = state.level || 1; hs.appendChild(span) } else { document.getElementById('levelVal').textContent = state.level || 1 } }
+ensureLevelDisplay()
 
 // --- milestone toast (injected) and leaderboard storage/UI ---
 function ensureMilestoneContainer(){ if(document.getElementById('milestoneToastContainer')) return; const style = document.createElement('style'); style.id = 'milestoneToastStyles'; style.textContent = `#milestoneToastContainer{position:fixed;top:86px;left:50%;transform:translateX(-50%);z-index:99999;pointer-events:none;display:flex;flex-direction:column;align-items:center}
@@ -288,7 +323,7 @@ function showMilestone(msg, ms = 2400){ try{ ensureMilestoneContainer(); const c
 function loadPlays(){ try{ const raw = localStorage.getItem('pop_plays'); return raw ? JSON.parse(raw) : [] }catch(e){ return [] } }
 function savePlays(plays){ try{ localStorage.setItem('pop_plays', JSON.stringify(plays)) }catch(e){ console.warn('savePlays failed', e) } }
 
-function recordPlay(name){ try{ const plays = loadPlays(); plays.push({ name: (name || 'Player'), score: state.score, date: new Date().toISOString() }); plays.sort((a,b)=>b.score - a.score || new Date(b.date) - new Date(a.date)); if(plays.length>100) plays.length = 100; savePlays(plays); }catch(e){console.warn('recordPlay failed', e)} }
+function recordPlay(name){ try{ const plays = loadPlays(); plays.push({ name: (name || 'Player'), score: state.score, level: state.level || 1, date: new Date().toISOString() }); plays.sort((a,b)=>b.score - a.score || new Date(b.date) - new Date(a.date)); if(plays.length>100) plays.length = 100; savePlays(plays); }catch(e){console.warn('recordPlay failed', e)} }
 
 function ensureLeaderboardModal(){ if(document.getElementById('leaderboardModal')) return; const style = document.createElement('style'); style.id='leaderboardStyles'; style.textContent = `#leaderboardModal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:99998}
 .leaderboardPanel{background:white;border-radius:10px;padding:16px;min-width:320px;max-width:92vw;max-height:86vh;overflow:auto}
@@ -302,7 +337,7 @@ function ensureLeaderboardModal(){ if(document.getElementById('leaderboardModal'
   document.getElementById('clearLeaderboardBtn').addEventListener('click', ()=>{ if(confirm('Clear leaderboard?')){ savePlays([]); populateLeaderboard(); } });
 }
 
-function populateLeaderboard(){ ensureLeaderboardModal(); const modal = document.getElementById('leaderboardModal'); const content = document.getElementById('leaderboardContent'); const plays = loadPlays(); if(plays.length===0){ content.innerHTML = '<div style="padding:12px;color:#6b7280">No plays yet — be the first!</div>'; } else { let html = `<table class="leaderboardTable"><thead><tr><th>#</th><th>Name</th><th>Score</th><th>Date</th></tr></thead><tbody>`; plays.slice(0,50).forEach((p,i)=>{ const d = new Date(p.date); html += `<tr><td>${i+1}</td><td>${escapeHtml(p.name)}</td><td>${p.score}</td><td>${d.toLocaleString()}</td></tr>` }); html += `</tbody></table>`; content.innerHTML = html; } modal.style.display = 'flex'; }
+function populateLeaderboard(){ ensureLeaderboardModal(); const modal = document.getElementById('leaderboardModal'); const content = document.getElementById('leaderboardContent'); const plays = loadPlays(); if(plays.length===0){ content.innerHTML = '<div style="padding:12px;color:#6b7280">No plays yet — be the first!</div>'; } else { let html = `<table class="leaderboardTable"><thead><tr><th>#</th><th>Name</th><th>Score</th><th>Level</th><th>Date</th></tr></thead><tbody>`; plays.slice(0,50).forEach((p,i)=>{ const d = new Date(p.date); html += `<tr><td>${i+1}</td><td>${escapeHtml(p.name)}</td><td>${p.score}</td><td>${p.level||1}</td><td>${d.toLocaleString()}</td></tr>` }); html += `</tbody></table>`; content.innerHTML = html; } modal.style.display = 'flex'; }
 
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]||c)); }
 
@@ -310,8 +345,6 @@ function escapeHtml(s){ return String(s).replace(/[&<>"']/g,(c)=>({"&":"&amp;","
 const leaderboardBtn = document.getElementById('leaderboardBtn')
 if(leaderboardBtn){ leaderboardBtn.addEventListener('click', (e)=>{ e.preventDefault(); populateLeaderboard(); }) }
 
-// show a milestone toast when a new high score is saved
-function saveHighscore(){ const v = parseInt(localStorage.getItem('pop_highscore')||'0'); if(state.score > v){ localStorage.setItem('pop_highscore', String(state.score)); highscoreVal.textContent = state.score; try{ showMilestone(`New High Score: ${state.score}!`) }catch(e){} } }
 loadHighscore()
 
 // Highscore modal with confetti and acknowledge button
@@ -324,16 +357,16 @@ function ensureHighscoreModal(){ if(document.getElementById('highscoreModal')) r
     wasRunningBeforeHighscore = null
   }) }
 
-function showHighscoreModal(score){ try{ ensureHighscoreModal(); const m = document.getElementById('highscoreModal'); const txt = document.getElementById('highscoreModalText'); if(txt) txt.textContent = `New High Score: ${score}`; // pause game
+// override saveHighscore to show modal (prefer modal over small toast)
+const _origSaveHighscore = (typeof saveHighscore === 'function') ? saveHighscore : null
+function showHighscoreModal(score, level){ try{ ensureHighscoreModal(); const m = document.getElementById('highscoreModal'); const txt = document.getElementById('highscoreModalText'); if(txt) txt.textContent = `New High Score: ${score} (Level ${level || 1})`; // pause game
     wasRunningBeforeHighscore = state.running; state.running = false
     // show modal and confetti
     m.classList.remove('hidden'); launchConfetti(); // remove leftover confetti after 5s
     setTimeout(()=>{ try{ document.querySelectorAll('.confetti').forEach(c=>c.remove()); }catch(e){} }, 5000);
   }catch(e){ console.warn('showHighscoreModal failed', e) } }
 
-// override saveHighscore to show modal (prefer modal over small toast)
-const _origSaveHighscore = (typeof saveHighscore === 'function') ? saveHighscore : null
-function saveHighscore(){ const v = parseInt(localStorage.getItem('pop_highscore')||'0'); if(state.score > v){ localStorage.setItem('pop_highscore', String(state.score)); highscoreVal.textContent = state.score; try{ showHighscoreModal(state.score) }catch(e){ try{ showMilestone(`New High Score: ${state.score}!`) }catch(e2){} } } }
+function saveHighscore(){ const v = parseInt(localStorage.getItem('pop_highscore')||'0'); if(state.score > v){ localStorage.setItem('pop_highscore', String(state.score)); localStorage.setItem('pop_highscore_level', String(state.level || 1)); highscoreVal.textContent = state.score; if(!state.highscoreAnnounced){ try{ showHighscoreModal(state.score, state.level || 1) }catch(e){ try{ showMilestone(`New High Score: ${state.score}! (L${state.level||1})`) }catch(e2){} } state.highscoreAnnounced = true } } }
 
 // shop toggle
 const storeToggle = document.getElementById('storeToggle')
@@ -357,7 +390,7 @@ document.querySelectorAll('.shop-item').forEach(si=>si.addEventListener('click',
 // game checks
 function checkWinLose(){updateUI(); // lose if poison >= 100 or if coins can't buy any refill and ammo=0? per spec: If the player does not have enough coins to continue, they lose just as if the poison bar overflows.
   if(state.poison >= 100){loseGame('Poison overwhelmed you!') ; return}
-  if(state.water >= 100){winGame() ; return}
+  if(state.water >= 100){ advanceLevel(); return }
   // end-game only happens when player has no coins AND no ammo
   const totalAmmo = Object.values(state.ammoCounts).reduce((a,b)=>a+b,0)
   if(totalAmmo <= 0 && state.coins <= 0){
@@ -385,11 +418,29 @@ function winGame(){
   messageTitle.textContent='You Win!'; messageText.textContent = `Score: ${state.score}`; messageOverlay.classList.remove('hidden'); launchConfetti();
 }
 
+function advanceLevel(){
+  // record level reached (but don't end the game)
+  try{ showMilestone(`Level ${state.level + 1}`) }catch(e){}
+  // increase level
+  state.level = (state.level || 1) + 1
+  // reset score when advancing to a new level
+  state.score = 0
+  // increase score goal by 250 per level
+  try{ CONFIG.totalScoreGoal = (parseInt(CONFIG.totalScoreGoal)||500) + 250 }catch(e){}
+  // reset bars and chains
+  state.water = 0; state.poison = 0; state.chainWater = 0; state.chainPoison = 0
+  ensureLevelDisplay()
+  // clear and respawn balloons with a slight poison bias increase handled in pickDropType
+  clearBalloons(); spawnBalloons( Math.min(40, 18 + (state.level*2)) )
+  // update UI
+  updateUI()
+}
+
 replayBtn.addEventListener('click', ()=>{resetGame()})
 exitBtn.addEventListener('click', ()=>{ messageOverlay.classList.add('hidden'); messageText.textContent=''; if(!state.running) resetGame() })
 
 function resetGame(){// reset state
-  state = {coins:0, ammo:CONFIG.startAmmo, weapon:'darts', ammoCounts: {darts:CONFIG.startAmmo, arrows:0, shuriken:0, kunai:0}, score:0, water:0, poison:0, chainWater:0, chainPoison:0, balloons:[], running:true}
+  state = {coins:0, ammo:CONFIG.startAmmo, weapon:'darts', ammoCounts: {darts:CONFIG.startAmmo, arrows:0, shuriken:0, kunai:0}, score:0, level:1, water:0, poison:0, chainWater:0, chainPoison:0, balloons:[], running:true, highscoreAnnounced:false}
   messageOverlay.classList.add('hidden')
   spawnBalloons(22)
   updateUI()
@@ -434,3 +485,15 @@ window.updateUI = patchedUpdateUI
 
 // expose for debugging
 window._POP_STATE = state
+
+// Safety: periodically ensure the game ends if player truly has no ammo and no coins.
+// This is intentionally non-invasive and won't change other flows; it simply
+// triggers the existing loseGame() when both resources are exhausted.
+setInterval(()=>{
+  try{
+    const totalAmmo = Object.values(state.ammoCounts || {}).reduce((a,b)=>a+b,0)
+    if(state.running && totalAmmo <= 0 && (state.coins || 0) <= 0){
+      loseGame('Out of ammo and coins!')
+    }
+  }catch(e){ /* ignore */ }
+}, 400)
