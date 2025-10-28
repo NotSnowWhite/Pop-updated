@@ -314,6 +314,27 @@ if(leaderboardBtn){ leaderboardBtn.addEventListener('click', (e)=>{ e.preventDef
 function saveHighscore(){ const v = parseInt(localStorage.getItem('pop_highscore')||'0'); if(state.score > v){ localStorage.setItem('pop_highscore', String(state.score)); highscoreVal.textContent = state.score; try{ showMilestone(`New High Score: ${state.score}!`) }catch(e){} } }
 loadHighscore()
 
+// Highscore modal with confetti and acknowledge button
+let wasRunningBeforeHighscore = null
+function ensureHighscoreModal(){ if(document.getElementById('highscoreModal')) return; const modal = document.createElement('div'); modal.id = 'highscoreModal'; modal.className = 'overlay-modal hidden'; modal.innerHTML = `<div class="modal"><h2>New High Score!</h2><p id="highscoreModalText"></p><div class="modal-actions"><button id="ackHighscoreBtn">Continue</button></div></div>`; document.body.appendChild(modal);
+  const btn = document.getElementById('ackHighscoreBtn'); btn.addEventListener('click', ()=>{ const m = document.getElementById('highscoreModal'); if(m) m.classList.add('hidden'); // remove confetti elements if present
+    try{ document.querySelectorAll('.confetti').forEach(c=>c.remove()); }catch(e){}
+    // resume game
+    state.running = (wasRunningBeforeHighscore !== null) ? wasRunningBeforeHighscore : true
+    wasRunningBeforeHighscore = null
+  }) }
+
+function showHighscoreModal(score){ try{ ensureHighscoreModal(); const m = document.getElementById('highscoreModal'); const txt = document.getElementById('highscoreModalText'); if(txt) txt.textContent = `New High Score: ${score}`; // pause game
+    wasRunningBeforeHighscore = state.running; state.running = false
+    // show modal and confetti
+    m.classList.remove('hidden'); launchConfetti(); // remove leftover confetti after 5s
+    setTimeout(()=>{ try{ document.querySelectorAll('.confetti').forEach(c=>c.remove()); }catch(e){} }, 5000);
+  }catch(e){ console.warn('showHighscoreModal failed', e) } }
+
+// override saveHighscore to show modal (prefer modal over small toast)
+const _origSaveHighscore = (typeof saveHighscore === 'function') ? saveHighscore : null
+function saveHighscore(){ const v = parseInt(localStorage.getItem('pop_highscore')||'0'); if(state.score > v){ localStorage.setItem('pop_highscore', String(state.score)); highscoreVal.textContent = state.score; try{ showHighscoreModal(state.score) }catch(e){ try{ showMilestone(`New High Score: ${state.score}!`) }catch(e2){} } } }
+
 // shop toggle
 const storeToggle = document.getElementById('storeToggle')
 const shopEl = document.getElementById('shop')

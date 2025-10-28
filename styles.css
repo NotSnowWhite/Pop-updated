@@ -825,3 +825,30 @@ header #topCenter #progress { pointer-events: auto }
 		font-size: 13px
 	}
 } 
+
+/* Fixes for very small screens (<=480px): prevent overlaps, make controls static below the game */
+@media (max-width: 480px) {
+	/* Flow header vertically so progress never sits on top of buttons */
+	header { display: flex; flex-direction: column; align-items: stretch; padding: 8px 10px; }
+	header #topCenter { position: static !important; left: auto !important; top: auto !important; transform: none !important; pointer-events: auto; margin: 6px 0; }
+	header #topCenter #progress { width: 72vw; max-width: 260px; height: 14px }
+	header .header-right { position: static !important; right: auto !important; top: auto !important; margin-top: 8px; display: flex; justify-content: flex-end; gap: 8px }
+
+	/* Highscore should flow under the header and not overlap the progress */
+	#highscore { position: static !important; display: block; margin: 6px auto 8px; z-index: 50; text-align: center; }
+
+	/* Ensure the game title is visible on small screens and not pushed off the top */
+	#gameTitle { top: 0 !important; position: relative !important; }
+
+	/* Keep footer and controls static in flow so they sit beneath the board */
+	footer { position: static !important; left: auto; right: auto; bottom: auto; width: 100%; box-shadow: none; padding: 10px 12px; margin-top: 8px; z-index: 40 }
+	#controls { position: static !important; display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:8px }
+	#weaponsBar { display:flex; gap:8px }
+	#actionBar { order: 2 }
+
+	/* Give the board more bottom padding so footer/controls never cover popping area */
+	#board { padding-bottom: 220px; min-height: 48vh }
+
+	/* Ensure the external footer (site footer) remains below everything */
+	#externalFooter { position: static !important; box-shadow: none; }
+}
