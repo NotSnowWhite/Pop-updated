@@ -1,0 +1,716 @@
+/* cheery carnival font fallback: prefer 'Baloo 2' if available */
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap');
+
+* {
+	box-sizing: border-box;
+	font-family: 'Baloo 2', 'Segoe UI', Roboto, Arial, sans-serif
+}
+
+body {
+	margin: 0;
+	background: linear-gradient(180deg, #ffe69a 0%, #ffd1dc 60%, #bdefff 100%);
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center
+}
+
+#game {
+	width: 1000px;
+	max-width: 96vw;
+	background: rgba(255, 255, 255, 0.9);
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+	border-radius: 12px;
+	overflow: hidden
+}
+
+#coins {
+	display: flex;
+	align-items: center;
+	/* vertically aligns everything evenly */
+	gap: 6px;
+}
+
+img {
+	width: auto;
+	height: 20px;
+}
+
+header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 20px;
+	background: linear-gradient(90deg, #ffedd5, #fff7ed);
+	position: relative;
+	flex-wrap: wrap
+}
+
+header h1 {
+	margin: 0;
+	font-size: 28px;
+	color: #b91c1c;
+	text-shadow: 0 2px 0 rgba(255, 255, 255, 0.6)
+}
+
+.header-right {
+	display: flex;
+	align-items: center;
+	gap: 8px
+}
+
+.storeToggle {
+	background: linear-gradient(180deg, #fff7ed, #fff1f2);
+	border-radius: 12px;
+	padding: 8px 12px;
+	border: 2px solid #ffd1dc;
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+	font-weight: 800;
+	cursor: pointer
+}
+
+.storeToggle:hover {
+	transform: translateY(-2px)
+}
+
+.counter {
+	font-weight: 700;
+	color: #374151;
+	background: rgba(255, 255, 255, 0.6);
+	padding: 6px 10px;
+	border-radius: 12px;
+	box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.05)
+}
+
+#progress {
+	position: relative;
+	left: auto;
+	transform: none;
+	width: 45%;
+	height: 18px;
+	background: linear-gradient(90deg, #f3f4f6, #efeaf1);
+	border-radius: 12px;
+	overflow: hidden;
+	border: 2px solid rgba(0, 0, 0, 0.05)
+}
+
+.bar {
+	height: 100%;
+	position: absolute;
+	top: 0
+}
+
+.water {
+	left: 0;
+	background: linear-gradient(180deg, #60a5fa, #3b82f6);
+	width: 30%;
+	transition: width 0.4s
+}
+
+.poison {
+	right: 0;
+	background: linear-gradient(180deg, #34d399, #10b981);
+	width: 20%;
+	transition: width 0.4s
+}
+
+main {
+	display: flex;
+	padding: 16px
+}
+
+#board {
+	flex: 1;
+	background: linear-gradient(180deg, #fff 0%, #fffbeb 100%);
+	border-radius: 10px;
+	border: 6px dashed rgba(0, 0, 0, 0.05);
+	min-height: 460px;
+	max-height: 74vh;
+	position: relative;
+	overflow: hidden;
+	padding: 12px
+}
+
+#shop {
+	width: 320px;
+	padding: 8px 12px
+}
+
+#shop h2 {
+	margin: 0 0 12px 0;
+	color: #7c2d12
+}
+
+.shop-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background: rgba(255, 255, 255, 0.7);
+	padding: 8px;
+	border-radius: 8px;
+	margin-bottom: 10px
+}
+
+.shop-item .emoji {
+	font-size: 32px;
+	width: 48px;
+	text-align: center
+}
+
+.shop-item .name {
+	font-weight: 700
+}
+
+.shop-item button {
+	background: #ef4444;
+	color: white;
+	border: none;
+	padding: 6px 8px;
+	border-radius: 6px;
+	cursor: pointer
+}
+
+.shop-item button.buy-refill {
+	background: #2563eb
+}
+
+footer {
+	display: flex;
+	justify-content: space-between;
+	padding: 12px 18px;
+	background: linear-gradient(90deg, #fff7ed, #fff1f2);
+	align-items: center
+}
+
+#weaponDisplay {
+	font-weight: 700
+}
+
+#overlay {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center
+}
+
+#overlay.hidden {
+	display: none
+}
+
+#message {
+	background: white;
+	padding: 24px;
+	border-radius: 8px;
+	text-align: center;
+	min-width: 320px
+}
+
+#message h2 {
+	margin: 0 0 8px 0
+}
+
+#message .buttons {
+	display: flex;
+	gap: 8px;
+	justify-content: center;
+	margin-top: 12px
+}
+
+#message button {
+	padding: 8px 12px;
+	border-radius: 6px;
+	border: none;
+	background: #06b6d4;
+	color: white;
+	cursor: pointer
+}
+
+.balloon {
+	width: 64px;
+	height: 84px;
+	border-radius: 50% 50% 45% 45%;
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12)
+}
+
+.balloon:after {
+	content: '';
+	width: 6px;
+	height: 14px;
+	background: #333;
+	position: absolute;
+	bottom: -14px;
+	border-radius: 2px
+}
+
+.splash {
+	position: absolute;
+	border-radius: 50%;
+	pointer-events: none
+}
+
+.coinSparkle {
+	position: absolute;
+	pointer-events: none
+}
+
+.confetti {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	overflow: hidden
+}
+
+.confetti .piece {
+	position: absolute;
+	width: 8px;
+	height: 16px;
+	opacity: 0.95;
+	border-radius: 2px
+}
+
+.weaponIcon {
+	font-size: 20px;
+	margin-right: 6px
+}
+
+.weaponImg {
+	width: 24px;
+	height: 24px;
+	vertical-align: middle
+}
+
+/* floating text */
+.floating {
+	pointer-events: none;
+	font-size: 14px;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6)
+}
+
+/* coin sprite */
+.coin {
+	position: absolute;
+	width: 32px;
+	height: 32px;
+	background: radial-gradient(circle at 35% 30%, #fff7d6, #fbbf24);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 700;
+	color: #92400e;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+}
+
+/* controls (mobile) */
+#controls {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 8px;
+	display: flex;
+	justify-content: center;
+	gap: 12px;
+	pointer-events: auto
+}
+
+#weaponsBar {
+	display: flex;
+	gap: 8px
+}
+
+.wbtn {
+	background: rgba(255, 255, 255, 0.95);
+	border-radius: 8px;
+	padding: 8px 10px;
+	border: 2px solid rgba(0, 0, 0, 0.06);
+	font-weight: 700
+}
+
+#actionBar {
+	display: flex;
+	gap: 8px
+}
+
+#actionBar button {
+	background: #ef4444;
+	color: white;
+	padding: 10px 14px;
+	border-radius: 10px;
+	border: none;
+	font-weight: 800
+}
+
+/* aim cursor */
+.aimCursor {
+	position: absolute;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	border: 3px solid rgba(255, 255, 255, 0.9);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+	pointer-events: none;
+	transform: translate(-50%, -50%);
+	display: none
+}
+
+/* particles for splashes */
+.particle {
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	pointer-events: none
+}
+
+/* balloon tail */
+.balloon:before {
+	content: '';
+	position: absolute;
+	width: 2px;
+	height: 30px;
+	background: linear-gradient(180deg, #333, #000);
+	bottom: -38px;
+	left: 50%;
+	transform: translateX(-50%);
+	border-radius: 1px
+}
+
+/* tutorial modal */
+.overlay-modal {
+	position: fixed;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0.45)
+}
+
+.overlay-modal .modal {
+	background: white;
+	padding: 20px;
+	border-radius: 10px;
+	max-width: 420px
+}
+
+.overlay-modal.hidden {
+	display: none
+}
+
+.modal .modal-actions {
+	display: flex;
+	gap: 8px;
+	justify-content: center;
+	margin-top: 12px
+}
+
+.modal button {
+	background: #ff66a3;
+	color: white;
+	border: none;
+	padding: 8px 12px;
+	border-radius: 8px;
+	cursor: pointer
+}
+
+.modal button#backFromTutorial {
+	background: #6b7280
+}
+
+/* coin counter animation */
+.coin-bounce {
+	animation: coinPop 400ms ease
+}
+
+@keyframes coinPop {
+	0% {
+		transform: scale(1)
+	}
+
+	50% {
+		transform: scale(1.5)
+	}
+
+	100% {
+		transform: scale(1)
+	}
+}
+
+/* high score display: place just below the topCenter progress */
+#highscore {
+	position: fixed;
+	left: 18px;
+	top: 68px;
+	font-weight: 700;
+	color: #111;
+	z-index: 65;
+	background: rgba(255, 255, 255, 0.85);
+	padding: 6px 8px;
+	border-radius: 8px
+}
+
+/* top center fixed title + progress */
+#topCenter {
+	position: fixed;
+	top: 12px;
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	z-index: 60;
+	pointer-events: none
+}
+
+#gameTitle {
+	font-size: 20px;
+	color: #b91c1c;
+	font-weight: 800;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+	pointer-events: auto
+}
+
+#topCenter #progress {
+	pointer-events: auto;
+	width: 520px;
+	height: 20px
+}
+
+#topCenter #progress .bar {
+	height: 100%;
+	top: 0
+}
+
+/* ensure header buttons remain on top-right above the board */
+header .header-right {
+	position: absolute;
+	right: 18px;
+	top: 10px;
+	z-index: 70
+}
+
+/* sliding shop panel */
+#shop {
+	position: fixed;
+	right: -360px;
+	top: 86px;
+	height: 70%;
+	background: rgba(255, 255, 255, 0.95);
+	box-shadow: -8px 12px 30px rgba(0, 0, 0, 0.12);
+	border-radius: 10px;
+	transition: right 300ms cubic-bezier(.2, .8, .2, 1);
+	z-index: 40
+}
+
+#shop.open {
+	right: 12px
+}
+
+#closeShop {
+	position: absolute;
+	right: 8px;
+	top: 8px;
+	background: transparent;
+	border: none;
+	font-size: 18px
+}
+
+/* spread balloons spacing: give larger board padding and avoid overlapping by limiting spawn area */
+.balloon {
+	min-width: 64px;
+	min-height: 84px
+}
+
+/* mobile layout tweaks */
+@media(max-width:900px) {
+	main {
+		flex-direction: column
+	}
+
+	#shop {
+		width: 100%;
+		order: 2
+	}
+
+	#board {
+		order: 1;
+		min-height: 58vh;
+		padding-bottom: 80px
+	}
+
+	header {
+		padding: 10px 12px
+	}
+
+	#topCenter {
+		top: 8px
+	}
+
+	#topCenter #progress {
+		width: 88vw;
+		max-width: 420px
+	}
+
+	/* shorten progress bar by ~20% on small screens */
+	#topCenter #progress {
+		width: 70vw;
+		max-width: 336px
+	}
+
+	#gameTitle {
+		font-size: 18px
+	}
+
+	/* shrink balloons and UI elements on mobile so nothing overlaps */
+	.balloon {
+		width: 46px;
+		height: 60px;
+		border-radius: 46% 46% 40% 40%
+	}
+
+	.balloon:after {
+		height: 10px;
+		bottom: -10px
+	}
+
+	.coin {
+		width: 24px;
+		height: 24px;
+		font-size: 12px
+	}
+
+	#highscore {
+		top: 110px;
+		left: 10px
+	}
+}
+
+/* responsive */
+@media(max-width:900px) {
+	#game {
+		width: 100%
+	}
+
+	#shop {
+		display: none
+	}
+}
+
+/* extra small phones: avoid overlaps by lowering topCenter, shrinking header buttons and controls */
+@media(max-width:480px) {
+
+	/* lower the title + progress a bit so header buttons don't overlap it */
+	#topCenter {
+		top: 20px
+	}
+
+	#topCenter #progress {
+		width: 68vw;
+		max-width: 288px;
+		height: 18px
+	}
+
+	#gameTitle {
+		font-size: 16px
+	}
+
+	/* make store/reset buttons smaller and move them slightly inward */
+	header .header-right {
+		right: 10px;
+		top: 6px;
+		gap: 6px
+	}
+
+	.storeToggle {
+		padding: 6px 8px;
+		font-size: 13px;
+		border-radius: 10px
+	}
+
+	/* reposition highscore so it sits under the top center and out of the way */
+	#highscore {
+		right: 10px;
+		left: auto;
+		top: 82px;
+		padding: 6px 8px
+	}
+
+	/* make balloons smaller and ensure board leaves room at bottom for controls/footer */
+	.balloon {
+		width: 40px;
+		height: 52px
+	}
+
+	.balloon:after {
+		height: 8px;
+		bottom: -8px
+	}
+
+	#board {
+		padding-bottom: 160px;
+		min-height: 50vh
+	}
+
+	/* shrink and lower the fixed controls so they don't overlap footer/weapon UI */
+	#controls {
+		bottom: 20px;
+		gap: 8px
+	}
+
+	.wbtn {
+		padding: 6px 8px;
+		font-size: 13px;
+		border-radius: 8px
+	}
+
+	#actionBar button {
+		padding: 8px 10px;
+		font-size: 13px;
+		border-radius: 8px
+	}
+
+	/* reduce footer footprint slightly so it doesn't compete for space */
+	footer {
+		padding: 8px 12px;
+		font-size: 13px
+	}
+
+	/* Make footer act as a fixed info bar above the controls so it never overlaps the board */
+	footer {
+		position: fixed;
+		left: 8px;
+		right: 8px;
+		bottom: 76px;
+		z-index: 72;
+		border-radius: 10px;
+		box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08)
+	}
+
+	/* narrower progress bar for very small screens */
+	#topCenter #progress {
+		width: 78vw;
+		max-width: 320px;
+		height: 16px
+	}
+
+	/* make the refill button smaller and more compact */
+	#actionBar button#refillBtn,
+	#actionBar button {
+		padding: 6px 8px;
+		font-size: 12px;
+		border-radius: 8px
+	}
+
+	/* ensure the weapon display and ammo have room and don't overlap controls */
+	#weaponDisplay,
+	#ammo {
+		font-size: 13px
+	}
+} 

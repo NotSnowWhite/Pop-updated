@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pop! - Carnival Balloon Game</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="game">
+    <header>
+      <div id="coins" class="counter">💰 <span id="coinCount">0</span>
+        <img src="/assets/logo.png" alt="Game logo" id="coinLogo">
+</div>
+      <div class="header-right">
+        <button id="storeToggle" aria-expanded="false" aria-controls="shop" class="storeToggle" aria-label="Open store">🛍️ Store</button>
+        <button id="resetBtn" class="storeToggle" aria-label="Reset game">🔁 Reset</button>
+      </div>
+    </header>
+
+    <!-- Top center title and progress -->
+    <div id="topCenter">
+      <div id="gameTitle">Pop!</div>
+      <div id="progress">
+        <div id="waterBar" class="bar water"></div>
+        <div id="poisonBar" class="bar poison"></div>
+      </div>
+    </div>
+    <div id="highscore">High: <span id="highscoreVal">0</span></div>
+
+    <main>
+      <div id="board" aria-label="Game board"></div>
+      <aside id="shop" aria-hidden="true">
+        <button id="closeShop" aria-label="Close store">✕</button>
+        <h2>Shop</h2>
+        <div class="shop-item" data-weapon="darts">
+          <div class="emoji">🎯</div>
+          <div>
+            <div class="name">Darts</div>
+            <div class="price">Refill: 5 coins</div>
+            <button class="buy" data-type="darts">Buy Refill</button>
+          </div>
+        </div>
+
+        <div class="shop-item" data-weapon="arrows">
+          <div class="emoji">🏹</div>
+          <div>
+            <div class="name">Arrows</div>
+            <div class="price">Buy: 150 | Refill: 50</div>
+            <button class="buy" data-type="arrows">Buy</button>
+            <button class="buy-refill" data-type="arrows">Refill</button>
+          </div>
+        </div>
+
+        <div class="shop-item" data-weapon="shuriken">
+          <div class="emoji">🌀</div>
+          <div>
+            <div class="name">Shuriken</div>
+            <div class="price">Buy: 250 | Refill: 75</div>
+            <button class="buy" data-type="shuriken">Buy</button>
+            <button class="buy-refill" data-type="shuriken">Refill</button>
+          </div>
+        </div>
+
+        <div class="shop-item" data-weapon="kunai">
+          <div class="emoji">🔪</div>
+          <div>
+            <div class="name">Kunai</div>
+            <div class="price">Buy: 500 | Refill: 150</div>
+            <button class="buy" data-type="kunai">Buy</button>
+            <button class="buy-refill" data-type="kunai">Refill</button>
+          </div>
+        </div>
+
+      </aside>
+    </main>
+
+    <footer>
+      <div id="weaponDisplay">Weapon: <span id="weaponIcon">🎯</span> <span id="weaponName">Darts</span></div>
+      <div id="ammo" class="counter">Ammo: <span id="ammoCount">5</span></div>
+    </footer>
+
+    <div id="overlay" class="hidden">
+      <div id="message">
+        <h2 id="messageTitle">You Win!</h2>
+        <p id="messageText"></p>
+        <div class="buttons">
+          <button id="replayBtn">Play Again</button>
+          <button id="exitBtn">Exit</button>
+        </div>
+      </div>
+    </div>
+    <!-- WebAudio will provide synthesized sounds (no external files required) -->
+
+    <!-- Mobile / touch controls -->
+    <div id="controls" role="toolbar" aria-label="Game controls">
+      <div id="weaponsBar" role="group" aria-label="Weapons">
+        <button class="wbtn" data-weapon="darts" aria-label="Select darts">1 🎯</button>
+        <button class="wbtn" data-weapon="arrows" aria-label="Select arrows">2 🏹</button>
+        <button class="wbtn" data-weapon="shuriken" aria-label="Select shuriken">3 🌀</button>
+        <button class="wbtn" data-weapon="kunai" aria-label="Select kunai">4 🔪</button>
+      </div>
+      <div id="actionBar" role="group" aria-label="Actions">
+        <button id="refillBtn" aria-label="Refill current weapon">Refill (R)</button>
+      </div>
+    </div>
+
+    <!-- Home modal: Start or view Tutorial -->
+    <div id="homeModal" class="overlay-modal">
+      <div class="modal">
+        <h2>Welcome to Pop!</h2>
+        <p>Pop colorful carnival balloons — collect coins, avoid poison, and fill the water meter to win.</p>
+        <div class="modal-actions">
+          <button id="startBtn">Start Game</button>
+          <button id="readBtn">Tutorial</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tutorial content modal (opened from Home) -->
+    <div id="tutorial" class="overlay-modal hidden">
+      <div class="modal">
+        <h2>Tutorial</h2>
+        <ol>
+          <li>Tap balloons to pop them. Water increases your water gauge, poison increases poison, coins give coins and +10 score.</li>
+          <li>Chaining water/poison doubles consecutive effects up to a cap.</li>
+          <li>Use coins to buy/refill weapons in the Store (open via the Store button).</li>
+          <li>When you run out of ammo and can't afford refills you lose. Reach the water gauge to win.</li>
+        </ol>
+        <div class="modal-actions">
+          <button id="backFromTutorial">Back</button>
+          <button id="startFromTutorial">Start Game</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
