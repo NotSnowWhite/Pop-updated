@@ -10,23 +10,23 @@
   <div id="game">
     <header>
       <div id="coins" class="counter">💰 <span id="coinCount">0</span>
-        <img src="/assets/logo.png" alt="Game logo" id="coinLogo">
+        <a href="https://www.charitywater.org/" target="_blank" rel="noopener noreferrer" title="Visit Charity: water"><img src="/assets/logo.png" alt="Game logo - Charity: water" id="coinLogo"></a>
 </div>
       <div class="header-right">
   <button id="storeToggle" aria-expanded="false" aria-controls="shop" class="storeToggle smallBtn" aria-label="Open store"><span class="btn-emoji">🛍️</span><span class="btn-label">Store</span></button>
   <button id="resetBtn" class="storeToggle smallBtn" aria-label="Reset game"><span class="btn-emoji">🔁</span><span class="btn-label">Reset</span></button>
   <button id="tutorialBtn" class="storeToggle smallBtn" aria-label="Open tutorial"><span class="btn-emoji">❓</span><span class="btn-label">Tutorial</span></button>
       </div>
+      <div id="topCenter">
+        <div id="gameTitle">Pop!</div>
+        <div id="progress">
+          <div id="waterBar" class="bar water"></div>
+          <div id="poisonBar" class="bar poison"></div>
+        </div>
+      </div>
     </header>
 
-    <!-- Top center title and progress -->
-    <div id="topCenter">
-      <div id="gameTitle">Pop!</div>
-      <div id="progress">
-        <div id="waterBar" class="bar water"></div>
-        <div id="poisonBar" class="bar poison"></div>
-      </div>
-    </div>
+    <!-- Top center title and progress (moved into header) -->
     <div id="highscore">High: <span id="highscoreVal">0</span></div>
 
     <main>
@@ -78,6 +78,20 @@
 
     <footer>
       <div id="weaponDisplay">Weapon: <span id="weaponIcon">🎯</span> <span id="weaponName">Darts</span></div>
+
+      <!-- Mobile / touch controls placed with the footer so they share the same area -->
+      <div id="controls" role="toolbar" aria-label="Game controls" style="margin-top:8px;">
+        <div id="weaponsBar" role="group" aria-label="Weapons">
+          <button class="wbtn" data-weapon="darts" aria-label="Select darts">1 🎯</button>
+          <button class="wbtn" data-weapon="arrows" aria-label="Select arrows">2 🏹</button>
+          <button class="wbtn" data-weapon="shuriken" aria-label="Select shuriken">3 🌀</button>
+          <button class="wbtn" data-weapon="kunai" aria-label="Select kunai">4 🔪</button>
+        </div>
+        <div id="actionBar" role="group" aria-label="Actions">
+          <button id="refillBtn" aria-label="Refill current weapon">Refill (R)</button>
+        </div>
+      </div>
+
       <div id="ammo" class="counter">Ammo: <span id="ammoCount">5</span></div>
     </footer>
 
@@ -93,18 +107,7 @@
     </div>
     <!-- WebAudio will provide synthesized sounds (no external files required) -->
 
-    <!-- Mobile / touch controls -->
-    <div id="controls" role="toolbar" aria-label="Game controls">
-      <div id="weaponsBar" role="group" aria-label="Weapons">
-        <button class="wbtn" data-weapon="darts" aria-label="Select darts">1 🎯</button>
-        <button class="wbtn" data-weapon="arrows" aria-label="Select arrows">2 🏹</button>
-        <button class="wbtn" data-weapon="shuriken" aria-label="Select shuriken">3 🌀</button>
-        <button class="wbtn" data-weapon="kunai" aria-label="Select kunai">4 🔪</button>
-      </div>
-      <div id="actionBar" role="group" aria-label="Actions">
-        <button id="refillBtn" aria-label="Refill current weapon">Refill (R)</button>
-      </div>
-    </div>
+    
 
     <!-- Home modal: Start or view Tutorial -->
     <div id="homeModal" class="overlay-modal">
@@ -135,6 +138,17 @@
       </div>
     </div>
   </div>
+
+  <!-- Simple site footer beneath the game board -->
+  <footer id="externalFooter" style="width:100%; display:flex; justify-content:center; padding:12px 0; background:transparent;">
+    <a href="https://www.charitywater.org/" target="_blank" rel="noopener noreferrer" title="Visit charity: water" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; font-family:'Myriad Pro', 'Segoe UI', Arial, sans-serif;">
+      <img src="/assets/logo.png" alt="charity: water logo" style="height:28px; width:auto; display:inline-block; vertical-align:middle;">
+      <div style="display:flex; flex-direction:column; line-height:1;">
+        <span style="font-weight:700; font-size:14px;">charity: water</span>
+        <span style="font-size:12px; color:#6b7280;">bringing clean water to communities</span>
+      </div>
+    </a>
+  </footer>
 
   <script src="script.js"></script>
 </body>

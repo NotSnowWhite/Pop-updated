@@ -6,13 +6,66 @@
 	font-family: 'Baloo 2', 'Segoe UI', Roboto, Arial, sans-serif
 }
 
+/* Small-screen overrides to prevent overlap and ensure stacking */
+@media (max-width: 700px) {
+	body { justify-content: flex-start; padding-top: 8px; }
+
+	/* Stack header content: logo, title/progress, header buttons */
+	header { display: flex; flex-direction: column; align-items: stretch; padding: 10px; }
+	header #topCenter { position: static; transform: none; left: auto; top: auto; margin: 12px 0; pointer-events: auto; }
+	header .header-right { position: static; margin-left: 0; margin-top: 12px; order: 3; display:flex; justify-content:flex-end; gap:8px }
+	#coins { order: 1; }
+
+	/* ensure coin counter and logo sit on the left and don't overlap */
+	#coins { align-self: flex-start; margin-left: 8px; z-index: 90 }
+	#coinLogo { height: 22px }
+
+	/* Make progress bar narrower and responsive */
+	#topCenter #progress { width: 86vw; max-width: 420px; }
+
+	/* Ensure highscore flows below header/title */
+	#highscore { margin-top: 6px; }
+
+	/* Footer and controls flow normally and stack */
+	footer { position: static; width: 100%; box-shadow: none; padding: 10px 12px; }
+	#controls { position: static; display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:8px }
+	#weaponsBar { order: 1; display:flex; gap:8px }
+	#actionBar { order: 2; }
+	#ammo { order: 3; margin-left: 8px }
+
+	/* Increase bottom padding of board to accommodate stacked footer/controls */
+	#board { padding-bottom: 220px }
+}
+
 body {
 	margin: 0;
 	background: linear-gradient(180deg, #ffe69a 0%, #ffd1dc 60%, #bdefff 100%);
 	min-height: 100vh;
 	display: flex;
+	flex-direction: column; /* stack #game and footer vertically so footer sits beneath the game */
 	align-items: center;
 	justify-content: center
+}
+
+/* External footer (charity) placed beneath the game (static flow) */
+#externalFooter {
+	position: static;
+	left: auto;
+	right: auto;
+	bottom: auto;
+	z-index: 30;
+	background: rgba(255,255,255,0.95);
+	box-shadow: 0 -4px 18px rgba(0,0,0,0.06);
+	width: 100%;
+}
+
+/* Ensure game has no extra bottom margin (footer sits in document flow) */
+#game { margin-bottom: 0; }
+
+/* On small screens the footer remains static and flows below content (same behavior) */
+@media (max-width: 700px) {
+	#externalFooter { position: static; box-shadow: none; }
+	#game { margin-bottom: 0; }
 }
 
 #game {
@@ -328,16 +381,14 @@ footer {
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
 }
 
-/* controls (mobile) */
+/* controls (mobile) - make static so weapons/refill scroll with the page */
 #controls {
-	position: fixed;
-	left: 0;
-	right: 0;
-	bottom: 8px;
+	position: static;
 	display: flex;
 	justify-content: center;
 	gap: 12px;
-	pointer-events: auto
+	pointer-events: auto;
+	margin: 8px 0;
 }
 
 #weaponsBar {
@@ -409,7 +460,8 @@ footer {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: rgba(0, 0, 0, 0.45)
+	background: rgba(0, 0, 0, 0.45);
+	z-index: 99999; /* ensure modals sit above fixed footers and controls on small screens */
 }
 
 .overlay-modal .modal {
@@ -480,29 +532,26 @@ footer {
 
 /* high score display: place just below the topCenter progress */
 #highscore {
-	position: fixed;
-	left: 18px;
-	top: 68px;
+	/* flow with the page instead of fixed so it scrolls */
+	position: static;
+	display: inline-block;
 	font-weight: 700;
 	color: #111;
-	z-index: 65;
 	background: rgba(255, 255, 255, 0.85);
 	padding: 6px 8px;
-	border-radius: 8px
+	border-radius: 8px;
+	margin: 8px auto 0;
 }
 
 /* top center fixed title + progress */
 #topCenter {
-	position: fixed;
-	top: 12px;
-	left: 50%;
-	transform: translateX(-50%);
+	/* make top title + progress static (flow with page) */
+	position: static;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	gap: 8px;
-	z-index: 60;
-	pointer-events: none
+	pointer-events: auto;
 }
 
 #gameTitle {
@@ -510,6 +559,8 @@ footer {
 	color: #b91c1c;
 	font-weight: 800;
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+	position: relative; /* nudge the title vertically without affecting other elements */
+	top: -30px; /* move game title up by 30px */
 	pointer-events: auto
 }
 
@@ -531,6 +582,17 @@ header .header-right {
 	top: 10px;
 	z-index: 70
 }
+
+/* center the top title + progress inside the header */
+header #topCenter {
+	position: absolute;
+	left: 50%;
+	top: calc(50% + 35px); /* nudge down by 15px */
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+	z-index: 60;
+}
+header #topCenter #progress { pointer-events: auto }
 
 /* sliding shop panel */
 #shop {
